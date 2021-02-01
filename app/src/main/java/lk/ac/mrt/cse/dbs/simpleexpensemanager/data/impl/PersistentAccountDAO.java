@@ -12,6 +12,12 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
 
 public class PersistentAccountDAO implements AccountDAO{
 
+    private final Map<String, Account> accounts;
+
+    public PersistentAccountDAO() {
+        this.accounts = new HashMap<>();
+    }
+
     @Override
     public List<String> getAccountNumbersList() {
         return null;

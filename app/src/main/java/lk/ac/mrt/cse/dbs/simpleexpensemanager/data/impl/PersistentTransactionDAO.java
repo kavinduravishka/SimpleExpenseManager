@@ -10,6 +10,12 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 
 public class PersistentTransactionDAO implements TransactionDAO{
 
+    private final List<Transaction> transactions;
+
+    public PersistentTransactionDAO() {
+        transactions = new LinkedList<>();
+    }
+
     @Override
     public void logTransaction(Date date, String accountNo, ExpenseType expenseType, double amount) {
 
