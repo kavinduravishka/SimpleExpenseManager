@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.AccountDAO;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.dbclient.DBaseClient;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
@@ -13,9 +14,15 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
 public class PersistentAccountDAO implements AccountDAO{
 
     private final Map<String, Account> accounts;
+    private DBaseClient dbclient;
 
     public PersistentAccountDAO() {
         this.accounts = new HashMap<>();
+    }
+
+
+    public void setDBclient(DBaseClient dbclient){
+        this.dbclient = dbclient;
     }
 
     @Override

@@ -6,10 +6,15 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.TransactionDAO;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.PersistentAccountDAO;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl.PersistentTransactionDAO;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.dbclient.*;
+
+import android.content.Context;
 
 public class PersistentExpenseManager extends ExpenseManager{
 
-    public PersistentExpenseManager() {
+    private DBaseClient DB;
+    public PersistentExpenseManager(Context context) {
+        this.DB = new DBaseClient(context);
         setup();
     }
 
@@ -17,10 +22,14 @@ public class PersistentExpenseManager extends ExpenseManager{
     public void setup() {
         /*** Begin generating dummy data for In-Memory implementation ***/
 
-        TransactionDAO persistentTransactionDAO = new PersistentTransactionDAO();
+        PersistentTransactionDAO transactionDAO  = new PersistentTransactionDAO();
+        transactionDAO.setDBclient(this.DB);
+        TransactionDAO persistentTransactionDAO = transactionDAO;
         setTransactionsDAO(persistentTransactionDAO);
 
-        AccountDAO persistentAccountDAO = new PersistentAccountDAO();
+        PersistentAccountDAO accountDAO = new PersistentAccountDAO();
+        accountDAO.setDBclient(this.DB);
+        AccountDAO persistentAccountDAO = accountDAO;
         setAccountsDAO(persistentAccountDAO);
 
         // dummy data
@@ -31,4 +40,5 @@ public class PersistentExpenseManager extends ExpenseManager{
 
         /*** End ***/
     }
+
 }
