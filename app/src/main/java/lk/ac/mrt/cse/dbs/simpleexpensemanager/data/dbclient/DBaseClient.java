@@ -10,13 +10,16 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.*;
 
 //import androidx.annotation.Nullable;
 
 public class DBaseClient extends SQLiteOpenHelper {
     public DBaseClient(Context context) {
+
         super(context, "180012M.db", null, 1);
+
     }
 
     @Override
@@ -43,41 +46,57 @@ public class DBaseClient extends SQLiteOpenHelper {
         DB.insert("transactionLog", null, contentValues);
     }
 
-    private List<Transaction> rowToTransaction(Cursor cursor){
-        List<Transaction> fetchedList = new ArrayList<Transaction>();
-
-        if (cursor.moveToFirst()){
-            do{
-
-                Transaction transaction = new Transaction(null,null,null,0);
-
-                transaction.setDate(Date.valueOf(cursor.getString(cursor.getColumnIndex("date"))));
-                transaction.setAccountNo(cursor.getString(cursor.getColumnIndex("accountNo")));
-                transaction.setExpenseType(ExpenseType.valueOf(cursor.getString(cursor.getColumnIndex("expenseType"))));
-                transaction.setAmount(Double.parseDouble(cursor.getString(cursor.getColumnIndex("amount"))));
-
-                fetchedList.add(transaction);
-            }while(cursor.moveToNext());
-        }
-        cursor.close();
-
-        return fetchedList;
-    }
-
-    public List<Transaction> getAllTransaction(){
+    public Cursor getAllTransaction(){
         SQLiteDatabase DB = this.getReadableDatabase();
         Cursor cursor = DB.rawQuery("SELECT  * from transactionLog",null);
-        List<Transaction> fetchedlist= this.rowToTransaction(cursor);
-
-        return fetchedlist;
+        return cursor;
     }
 
-    public List<Transaction> getPaginatedTransactionLogs(int limit) {
+    public Cursor getPaginatedTransactionLogs(int limit) {
         SQLiteDatabase DB = this.getReadableDatabase();
         Cursor cursor = DB.rawQuery("SELECT  * from transactionLog ORDER BY transactionID DESC LIMIT ?",new String[]{String.valueOf(limit)});
-        List<Transaction> fetchedlist= this.rowToTransaction(cursor);
+        return cursor;
+    }
 
-        return fetchedlist;
+    public Cursor getAccountNumbersList(){
+        SQLiteDatabase DB = this.getReadableDatabase();
+        Cursor cursor = DB.rawQuery("SELECT accountNo from account",null);
+        return cursor;
+    }
+
+    public Cursor getAccountsList() {
+        SQLiteDatabase DB  = this.getReadableDatabase();
+        Cursor cursor = DB.rawQuery("SELECT * from account",null);
+        return cursor;
+    }
+
+    public Cursor getAccount(String accountNo){
+        SQLiteDatabase DB = this.getReadableDatabase();
+        Cursor cursor = DB.rawQuery("SELECT * from account where accountNo=? LIMIT 1",new String[]{accountNo});
+        return cursor;
+    }
+
+    public void addAccount(Account account) {
+        SQLiteDatabase DB = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("accountNo",account.getAccountNo());
+        contentValues.put("bankName",account.getBankName());
+        contentValues.put("accountHolderName",account.getAccountHolderName());
+        contentValues.put("balance",account.getBalance());
+        DB.insert("account",null,contentValues);
+    }
+
+    public void removeAccount(String accountNo){
+        SQLiteDatabase DB = this.getWritableDatabase();
+        DB.execSQL("DELETE from account WHERE accontNo=?",new String[]{accountNo});
+    }
+
+    public void updateBalance(Account account){
+        SQLiteDatabase DB = this.getWritableDatabase();
+        String accountNo = account.getAccountNo();
+        String bankName = account.getBankName();
+        String amount = String.valueOf(account.getBalance());
+        DB.rawQuery("UPDATE account SET amount=? where accountNo=? AND bankName=?",new String[]{amount,accountNo,bankName});
     }
 
 
