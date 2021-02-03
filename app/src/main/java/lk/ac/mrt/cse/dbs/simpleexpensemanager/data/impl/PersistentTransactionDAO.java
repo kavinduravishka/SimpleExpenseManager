@@ -1,5 +1,7 @@
 package lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -12,6 +14,7 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.dbclient.*;
 
 import android.database.Cursor;
+import android.util.Log;
 
 public class PersistentTransactionDAO implements TransactionDAO{
 
@@ -52,7 +55,18 @@ public class PersistentTransactionDAO implements TransactionDAO{
 
                 Transaction transaction = new Transaction(null,null,null,0);
 
-                transaction.setDate(java.sql.Date.valueOf(cursor.getString(cursor.getColumnIndex("date"))));
+                String fromDate = cursor.getString(cursor.getColumnIndex("date"));
+
+                Log.d("variable","PersistTransDAO method rowToTransaction -> fromDate :" + fromDate);
+                Date date;
+
+                if(fromDate.equals("")) {
+                    date = java.sql.Date.valueOf(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                }else{
+                    date = java.sql.Date.valueOf(fromDate);
+                }
+
+                transaction.setDate(date);
                 transaction.setAccountNo(cursor.getString(cursor.getColumnIndex("accountNo")));
                 transaction.setExpenseType(ExpenseType.valueOf(cursor.getString(cursor.getColumnIndex("expenseType"))));
                 transaction.setAmount(Double.parseDouble(cursor.getString(cursor.getColumnIndex("amount"))));

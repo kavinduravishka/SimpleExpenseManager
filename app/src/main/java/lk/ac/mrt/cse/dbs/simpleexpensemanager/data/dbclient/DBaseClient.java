@@ -1,12 +1,16 @@
 package lk.ac.mrt.cse.dbs.simpleexpensemanager.data.dbclient;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +43,14 @@ public class DBaseClient extends SQLiteOpenHelper {
     public void logTransaction(Transaction transaction){
         SQLiteDatabase DB = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("date", String.valueOf(transaction.getDate()));
+
+        String datePattern = "yyyy-MM-dd";
+        @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat(datePattern);
+        String date = df.format(transaction.getDate());
+
+        Log.d("variable","DBaseClient method logTransaction -> formatted date :"+date);
+
+        contentValues.put("date",date);
         contentValues.put("accountNo", transaction.getAccountNo());
         contentValues.put("expenseType", String.valueOf(transaction.getExpenseType()));
         contentValues.put("amount",transaction.getAmount());
@@ -96,7 +107,7 @@ public class DBaseClient extends SQLiteOpenHelper {
         String accountNo = account.getAccountNo();
         String bankName = account.getBankName();
         String amount = String.valueOf(account.getBalance());
-        DB.rawQuery("UPDATE account SET amount=? where accountNo=? AND bankName=?",new String[]{amount,accountNo,bankName});
+        DB.rawQuery("UPDATE account SET balance=? where accountNo=? AND bankName=?",new String[]{amount,accountNo,bankName});
     }
 
 
